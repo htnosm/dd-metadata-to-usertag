@@ -1,0 +1,5 @@
+aws_id: 'aws_id'
+aws_name: 'aws_name'
+meta:
+  platform: 'platform'
+  cpuCores: 'cpu_cores'
