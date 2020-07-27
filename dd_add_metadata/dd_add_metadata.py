@@ -1,21 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf8 -*-
 
+import os
 import yaml
 import argparse
 from datadog import initialize, api
 from operator import itemgetter
 
 
-def arg_parse():
+def arg_parse(bin_dir):
     parser = argparse.ArgumentParser(description='')
 
     parser.add_argument('-f', '--filter', type=str,
                         help='query to filter search results', default="")
     parser.add_argument('-c', '--conf-yaml', type=str,
-                        help='define yaml specify the metadata', default="./include_keys.yml")
-    parser.add_argument('-d', '--dryrun', action='store_true',
-                        help='without actually update, and output update plan')
+                        help='define yaml specify the metadata', default=f"{bin_dir}/include_keys.yml")
+    parser.add_argument('-a', '--add', action='store_true',
+                        help='add/update user tag')
     return(parser.parse_args())
 
 
@@ -36,7 +37,17 @@ def select_metadata(include_keys, metadata):
     return result
 
 
-def main(filter="", conf_yaml="./include_keys.yml", dryrun=False):
+def main():
+    bin_dir = os.path.dirname(os.path.abspath(__file__))
+
+    args = arg_parse(bin_dir)
+    if 'DD_API_KEY' not in os.environ or 'DD_APP_KEY' not in os.environ:
+        return "API key is not set."
+
+    add_metadata(args.filter, args.conf_yaml, args.add)
+
+
+def add_metadata(filter="", conf_yaml="./include_keys.yml", add=False):
     with open(conf_yaml, 'r') as yml:
         include_keys = yaml.safe_load(yml)
 
@@ -82,17 +93,16 @@ def main(filter="", conf_yaml="./include_keys.yml", dryrun=False):
         if before_tags == update_tags:
             print("skipped")
         else:
-            if dryrun:
-                print(f"[dryrun] update_tags: {update_tags}")
-            else:
+            if add:
                 try:
                     res = api.Tag.update(
                         datadogs_host, tags=update_tags, source="Users")
                     print(f"updated: {res}")
                 except Exception as e:
                     raise e
+            else:
+                print(f"[dryrun] update_tags: {update_tags}")
 
 
 if __name__ == '__main__':
-    args = arg_parse()
-    main(args.filter, args.conf_yaml, args.dryrun)
+    main()

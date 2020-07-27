@@ -17,23 +17,23 @@ Add Datadog host's metadata to user tag
 ## Installation
 
 ```
-virtualenv -p python3 .venv
-. ./.venv/bin/activate
-pip install -r requirements.txt
+python setup.py install
+
+or
+
+pip install .
 ```
 
 ## Usage
 
 ```bash
-cd dd_add_metadata/
-
 export DD_API_KEY=""
 export DD_APP_KEY=""
 
 # Help
-python dd_add_metadata.py -h
+dd_add_metadata -h
 # DryRun
-python dd_add_metadata.py -d
-# Update
-python dd_add_metadata.py
+dd_add_metadata
+# Add or Update
+dd_add_metadata -a
 ```
