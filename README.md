@@ -16,6 +16,14 @@ Add Datadog host's metadata to user tag
 
 ## Installation
 
+### From pip
+
+```
+pip install git+https://github.com/htnosm/dd-metadata-to-usertag.git
+```
+
+### From source
+
 ```
 python setup.py install
 
